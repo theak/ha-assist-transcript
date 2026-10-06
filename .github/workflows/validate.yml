@@ -32,6 +32,24 @@ jobs:
         with:
           python-version: "3.14"
       - run: pip install homeassistant
+      - name: Install the libraries Assist's components need
+        run: |
+          python - <<'PY' > requirements.txt
+          import json, pathlib, homeassistant.components as comps
+          root = pathlib.Path(comps.__path__[0])
+          todo, seen, reqs = ["assist_pipeline"], set(), set()
+          while todo:
+              name = todo.pop()
+              if name in seen or not (root / name / "manifest.json").exists():
+                  continue
+              seen.add(name)
+              m = json.loads((root / name / "manifest.json").read_text())
+              reqs.update(m.get("requirements", []))
+              todo += m.get("dependencies", []) + m.get("after_dependencies", [])
+          print("\n".join(sorted(reqs)))
+          PY
+          cat requirements.txt
+          pip install -r requirements.txt
       - name: Check the debug store the sensor reads
         run: |
           python - <<'PY'
