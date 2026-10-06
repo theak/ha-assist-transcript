@@ -1,18 +1,14 @@
-# Assist Transcript
+# Home Assistant Assist Transcript Sensor
 
-A Home Assistant sensor that holds the last question you asked a voice satellite (such as the
-Home Assistant Voice Preview Edition) and the answer it gave. Use it to show the conversation on
-a dashboard, for example on a wall tablet next to the speaker.
+There's annoyingly no built-in way in Home Assistant to show a dashboard card with the last question / answer you asked to your Assistant entity (like a Voice PE), so this custom integration solves that problem by storing the last question you asked + the answer in a sensor that you can render as a card in your dashboard:
 
-Home Assistant doesn't publish what was said to Assist as events or entities, so there's no
-built-in way to show it outside the voice debug page.
+<img width="522" height="114" alt="image" src="https://github.com/user-attachments/assets/90a3850a-d295-4b6e-b39f-bd64f672b28b" />
+
 
 > [!WARNING]
 > This reads Home Assistant's **internal voice debug log**, the data behind
 > **Settings → Voice assistants → ⋮ → Debug**. That isn't a public API, so a Home Assistant
-> update could change it and break this integration. If the sensor stops updating after an
-> upgrade, check the [issues](https://github.com/theak/ha-assist-transcript/issues). A weekly
-> check in this repo runs against the newest Home Assistant release to catch that early.
+> update could change it and break this integration, but I've confirmed it works as of version `2026.8.2`.
 
 ## What you get
 
