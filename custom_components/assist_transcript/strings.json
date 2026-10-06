@@ -1,0 +1,12 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Adds a sensor that holds the last question asked of a voice satellite and its answer."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Assist Transcript is already set up."
+    }
+  }
+}

@@ -1,0 +1,47 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: integration
+          # Brand images live in the home-assistant/brands repo; this integration has none.
+          ignore: brands
+
+  # The sensor reads Assist's internal debug store. This weekly run against the newest Home
+  # Assistant release catches it being renamed or reshaped before you hit it on upgrade.
+  internals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install homeassistant
+      - name: Check the debug store the sensor reads
+        run: |
+          python - <<'PY'
+          import dataclasses, inspect
+          from homeassistant.components.assist_pipeline.pipeline import (
+              KEY_ASSIST_PIPELINE, PipelineData, PipelineRunDebug)
+          from homeassistant.components.assist_pipeline import PipelineEvent
+          assert KEY_ASSIST_PIPELINE
+          assert "self.pipeline_debug" in inspect.getsource(PipelineData.__init__)
+          assert {"events", "timestamp"} <= {f.name for f in dataclasses.fields(PipelineRunDebug)}
+          assert {"type", "data"} <= {f.name for f in dataclasses.fields(PipelineEvent)}
+          import homeassistant.const as c; print("OK on Home Assistant", c.__version__)
+          PY
